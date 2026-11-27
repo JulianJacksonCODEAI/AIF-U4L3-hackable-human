@@ -774,7 +774,7 @@ function renderPicker() {
 
 function openPersona(id) {
   state.personaId = id;
-  state.view = state.mode === 'breach' ? 'report' : 'posts';
+  state.view = 'posts';
   if (state.mode === 'breach') renderBreach(); else renderDesk();
   focusTitle();
   const persona = getPersona();
@@ -1084,7 +1084,8 @@ function makeCall(persona, message, call) {
     reader.classList.add('is-revealed');
     if (feedback) {
       feedback.focus({ preventScroll: true });
-      feedback.scrollIntoView({ block: 'nearest', behavior: REDUCED_MOTION.matches ? 'auto' : 'smooth' });
+      const offset = feedback.getBoundingClientRect().top - reader.getBoundingClientRect().top;
+      reader.scrollTop += Math.max(0, offset - 12);
     }
   }
   const right = call === message.verdict;
@@ -1134,21 +1135,33 @@ function renderMessageFeedback(persona, message, call) {
     box.appendChild(tactics);
 
     const post = persona.posts.find(function (p) { return p.id === message.postId; });
-    if (post) {
-      const link = make('button', 'post-link');
-      link.type = 'button';
-      link.appendChild(image(post.image, '', 'post-link-photo'));
-      const text = make('span', 'post-link-text');
-      text.appendChild(make('span', 'post-link-label', `Built from ${persona.first}’s post`));
-      text.appendChild(make('span', 'post-link-handle', post.handle));
-      link.appendChild(text);
-      link.addEventListener('click', function () { showLinkedPost(persona, post); });
-      box.appendChild(link);
-    }
+    if (post) box.appendChild(renderUsedPost(persona, post));
   } else if (message.tip) {
     box.appendChild(make('p', 'feedback-tip', message.tip));
   }
   return box;
+}
+
+/* The post the attacker used, shown inside the feedback so the evidence never needs another panel. */
+function renderUsedPost(persona, post) {
+  const figure = make('figure', 'used-post');
+  figure.appendChild(image(post.image, post.alt, 'used-post-photo'));
+  const body = make('figcaption', 'used-post-body');
+  body.appendChild(make('span', 'used-post-label', `Built from ${persona.first}’s post`));
+  body.appendChild(make('span', 'used-post-handle', post.handle));
+  const caption = make('span', 'used-post-caption');
+  highlight(caption, post.caption, post.giveaways.map(function (text) {
+    return { text: text, className: 'mark-giveaway' };
+  }));
+  body.appendChild(caption);
+  const link = make('button', 'used-post-link');
+  link.type = 'button';
+  link.appendChild(make('span', null, 'Show in posts'));
+  link.setAttribute('aria-label', `Show the post by ${post.handle} in ${persona.first}’s posts`);
+  link.addEventListener('click', function () { showLinkedPost(persona, post); });
+  body.appendChild(link);
+  figure.appendChild(body);
+  return figure;
 }
 
 function showLinkedPost(persona, post) {
@@ -1176,11 +1189,6 @@ function renderBreach() {
   el.main.replaceChildren();
 
   const desk = make('div', 'desk desk-breach');
-  desk.dataset.view = state.view;
-  desk.appendChild(renderViewTabs(desk, [
-    { id: 'report', label: 'Report' },
-    { id: 'attacks', label: 'Attack types' }
-  ]));
   desk.appendChild(renderReportPanel(persona));
   desk.appendChild(renderAttackPanel(persona));
   el.main.appendChild(desk);

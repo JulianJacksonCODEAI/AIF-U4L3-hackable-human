@@ -985,45 +985,67 @@ img.is-placeholder {
   font-weight: 600;
 }
 
-.post-link {
-  display: flex;
-  align-items: center;
+.used-post {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
   gap: 10px;
-  width: 100%;
-  padding: 6px;
-  border: 1px solid var(--line);
+  margin: 0;
+  padding: 8px;
+  border: 1px solid var(--warn);
   border-radius: 8px;
-  background: rgba(0, 0, 0, 0.25);
-  text-align: start;
+  background: var(--card);
+  color: var(--ink);
 }
 
-.post-link:hover {
-  border-color: var(--warn);
-}
-
-.post-link-photo {
-  width: 56px;
-  height: 40px;
-  flex-shrink: 0;
-  border-radius: 4px;
+.used-post-photo {
+  width: 72px;
+  height: 72px;
+  border-radius: 6px;
   object-fit: cover;
-  background: var(--brand);
+  background: var(--brand-dark);
 }
 
-.post-link-text {
+.used-post-body {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
   min-width: 0;
 }
 
-.post-link-label {
+.used-post-label {
+  color: var(--warn-dark);
+  font-size: 0.75rem;
   font-weight: 700;
-  font-size: 0.875rem;
 }
 
-.post-link-handle {
-  color: var(--warn);
+.used-post-handle {
+  font-weight: 700;
   font-size: 0.8125rem;
+}
+
+.used-post-caption {
+  color: var(--ink-soft);
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.used-post-link {
+  margin-top: 4px;
+  min-height: 28px;
+  padding: 2px 10px;
+  border: 1px solid var(--brand);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--brand);
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.used-post-link:hover {
+  background: var(--brand);
+  color: var(--paper);
 }
 
 /* Breach report */
@@ -1258,6 +1280,71 @@ img.is-placeholder {
     grid-template-rows: auto minmax(0, 1fr);
   }
 
+  /* Breach keeps the evidence and the choices on one screen: report on top, compact choices below. */
+  .desk.desk-breach {
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+
+  .desk-breach .panel-attacks {
+    overflow: visible;
+  }
+
+  .desk-breach .panel-attacks .panel-head {
+    padding: 8px 12px;
+  }
+
+  .desk-breach .attack-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    padding: 8px;
+  }
+
+  .desk-breach .attack-photo {
+    display: none;
+  }
+
+  .desk-breach .attack-text {
+    padding: 6px 8px 8px;
+  }
+
+  .desk-breach .attack-name {
+    padding-inline-end: 24px;
+    font-size: 0.875rem;
+  }
+
+  .desk-breach .attack-definition {
+    font-size: 0.75rem;
+  }
+
+  .desk-breach .panel-attacks .feedback {
+    gap: 6px;
+    margin: 8px 8px 0;
+    padding: 8px 12px;
+  }
+
+  /* The screen title already names the report; keep its heading for screen readers only. */
+  .desk-breach .panel-report .panel-head {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .desk-breach .feedback-tip {
+    display: none;
+  }
+
+  .role-badge,
+  .status-line {
+    display: none;
+  }
+
+  .screen-title {
+    font-size: 1.125rem;
+  }
+
   .view-tabs {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1280,9 +1367,7 @@ img.is-placeholder {
   }
 
   .desk[data-view="posts"] [data-panel="inbox"],
-  .desk[data-view="inbox"] [data-panel="posts"],
-  .desk[data-view="report"] [data-panel="attacks"],
-  .desk[data-view="attacks"] [data-panel="report"] {
+  .desk[data-view="inbox"] [data-panel="posts"] {
     display: none;
   }
 
@@ -1297,19 +1382,30 @@ img.is-placeholder {
   }
 
   .header-end {
-    align-items: flex-start;
+    flex: 1;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 12px;
     text-align: start;
   }
+}
 
-  .topbar {
-    flex-direction: column;
-    align-items: flex-start;
+@media (max-width: 600px) {
+  .desk-breach .attack-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* On phones the whole report reads first and the page scrolls to the choices. */
+  .desk.desk-breach {
+    grid-template-rows: auto auto;
+    height: auto;
   }
 }
 
 @media (max-width: 480px) {
-  .post-grid,
-  .attack-grid {
+  .post-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 
